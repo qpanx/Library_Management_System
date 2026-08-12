@@ -1,0 +1,510 @@
+{{--<!DOCTYPE html>--}}
+{{--<html lang="en">--}}
+
+{{--<head>--}}
+
+{{--    @include('home.css')--}}
+{{--</head>--}}
+
+{{--<body>--}}
+
+{{--@include('home.header');--}}
+
+{{--@include ('home.main_banner');--}}
+
+{{--@include('home.category');--}}
+
+{{--@include('home.book');--}}
+
+{{--@include('home.footer');--}}
+
+{{--</body>--}}
+{{--</html>--}}
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Public Library | Knowledge Hub</title>
+
+    <!-- Google Fonts: Playfair Display (Serif for headings) and Inter (Sans for body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (via CDN for instant styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Configuration for Tailwind Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        library: {
+                            dark: '#0f172a',   /* Slate 900 */
+                            primary: '#334155', /* Slate 700 */
+                            accent: '#d97706',  /* Amber 600 */
+                            light: '#f8fafc',   /* Slate 50 */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Image Gradient */
+        .hero-bg {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1507842217121-9e93c8aaf27c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Book Card Hover Effect */
+        .book-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-library-light text-slate-800 antialiased">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-md fixed w-full z-50 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20">
+            <div class="flex items-center">
+                <a href="#" class="flex-shrink-0 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open-reader text-3xl text-library-accent"></i>
+                    <span class="font-serif text-2xl font-bold text-library-dark">Lumina<span class="text-library-accent">.</span></span>
+                </a>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="text-slate-600 hover:text-library-accent font-medium transition">Home</a>
+                <a href="#catalog" class="text-slate-600 hover:text-library-accent font-medium transition">Catalog</a>
+                <a href="#categories" class="text-slate-600 hover:text-library-accent font-medium transition">Categories</a>
+                <a href="#services" class="text-slate-600 hover:text-library-accent font-medium transition">Services</a>
+
+{{--                <a href="#" class="px-5 py-2.5 bg-library-dark text-white rounded-full font-medium hover:bg-library-accent transition duration-300 shadow-lg shadow-library-accent/20">--}}
+{{--                    Login / Sign Up--}}
+{{--                </a>--}}
+                @if (Route::has('login'))
+                    <nav class="flex items-center justify-end gap-4">
+                        @auth
+                            <li><a href="{{ route('register') }}">Logout</a></li>
+                        @else
+                            <li><a href="{{ route('login') }}">Login</a></li>
+
+                            @if (Route::has('register'))
+                                <li><a href="{{ route('register') }}">Register</a></li>
+                            @endif
+                        @endauth
+                    </nav>
+                @endif
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center">
+                <button onclick="toggleMenu()" class="text-slate-600 hover:text-library-dark focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Panel -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-library-accent hover:bg-slate-50">Home</a>
+            <a href="#catalog" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-library-accent hover:bg-slate-50">Catalog</a>
+            <a href="#categories" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-library-accent hover:bg-slate-50">Categories</a>
+            <a href="#services" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-library-accent hover:bg-slate-50">Services</a>
+            <div class="mt-4 px-3">
+                <a href="#" class="block w-full text-center px-5 py-3 bg-library-dark text-white rounded-lg font-medium">Login</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div id="home" class="hero-bg relative h-[600px] flex items-center justify-center text-center px-4">
+    <div class="max-w-3xl mx-auto pt-16 animate-fade-in-up">
+            <span class="inline-block py-1 px-3 rounded-full bg-library-accent/20 text-library-accent border border-library-accent/30 text-sm font-semibold mb-6 backdrop-blur-sm">
+                Welcome to Lumina Public Library
+            </span>
+        <h1 class="font-serif text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Discover a World of <br/> <span class="text-library-accent italic">Endless Knowledge</span>
+        </h1>
+        <p class="text-slate-300 text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light">
+            Access over 50,000 digital and physical books, research papers, and audiobooks. Your gateway to learning starts here.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="bg-white p-2 rounded-full shadow-2xl max-w-xl mx-auto flex items-center">
+            <i class="fa-solid fa-magnifying-glass text-slate-400 ml-4"></i>
+            <input type="text" placeholder="Search by title, author, or ISBN..." class="flex-1 px-4 py-2 outline-none text-slate-700 placeholder-slate-400">
+            <button class="bg-library-dark text-white px-6 py-3 rounded-full hover:bg-library-accent transition duration-300 font-medium">
+                Search
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Strip -->
+<div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-3xl font-serif font-bold text-library-dark">50k+</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide mt-1">Books Available</div>
+            </div>
+            <div>
+                <div class="text-3xl font-serif font-bold text-library-dark">12k+</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide mt-1">Active Members</div>
+            </div>
+            <div>
+                <div class="text-3xl font-serif font-bold text-library-dark">200+</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide mt-1">Daily Events</div>
+            </div>
+            <div>
+                <div class="text-3xl font-serif font-bold text-library-dark">24/7</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide mt-1">Digital Access</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Categories -->
+<section id="categories" class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="font-serif text-3xl md:text-4xl font-bold text-library-dark mb-4">Explore by Category</h2>
+            <div class="h-1 w-20 bg-library-accent mx-auto rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <!-- Category Item 1 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-rocket text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">Sci-Fi</h3>
+            </a>
+
+            <!-- Category Item 2 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-landmark text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">History</h3>
+            </a>
+
+            <!-- Category Item 3 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-leaf text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">Nature</h3>
+            </a>
+
+            <!-- Category Item 4 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-brain text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">Psychology</h3>
+            </a>
+
+            <!-- Category Item 5 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-pink-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-heart text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">Romance</h3>
+            </a>
+
+            <!-- Category Item 6 -->
+            <a href="#" class="group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition text-center border border-slate-100">
+                <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-briefcase text-xl"></i>
+                </div>
+                <h3 class="font-medium text-slate-800">Business</h3>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Books Section -->
+<section id="catalog" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold text-library-dark mb-2">Trending Books</h2>
+                <p class="text-slate-500">Curated picks from our librarians this week.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <button class="text-library-accent font-semibold hover:text-orange-700 transition flex items-center gap-2">
+                    View Full Catalog <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            <!-- Book 1 -->
+            <div class="book-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group">
+                <div class="relative h-64 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800" alt="Book Cover" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-regular fa-heart"></i></button>
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-solid fa-cart-shopping"></i></button>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">Available</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-xs text-library-accent font-semibold mb-1 uppercase tracking-wider">Classic</div>
+                    <h3 class="font-serif font-bold text-lg text-library-dark mb-1">The Great Gatsby</h3>
+                    <p class="text-slate-500 text-sm mb-4">F. Scott Fitzgerald</p>
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+                        <div class="flex text-yellow-400 text-xs gap-0.5">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">$14.99</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book 2 -->
+            <div class="book-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group">
+                <div class="relative h-64 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800" alt="Book Cover" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-regular fa-heart"></i></button>
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-solid fa-cart-shopping"></i></button>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">On Loan</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-xs text-library-accent font-semibold mb-1 uppercase tracking-wider">Business</div>
+                    <h3 class="font-serif font-bold text-lg text-library-dark mb-1">Deep Work</h3>
+                    <p class="text-slate-500 text-sm mb-4">Cal Newport</p>
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+                        <div class="flex text-yellow-400 text-xs gap-0.5">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">$18.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book 3 -->
+            <div class="book-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group">
+                <div class="relative h-64 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=800" alt="Book Cover" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-regular fa-heart"></i></button>
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-solid fa-cart-shopping"></i></button>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">Available</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-xs text-library-accent font-semibold mb-1 uppercase tracking-wider">Psychology</div>
+                    <h3 class="font-serif font-bold text-lg text-library-dark mb-1">Thinking, Fast & Slow</h3>
+                    <p class="text-slate-500 text-sm mb-4">Daniel Kahneman</p>
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+                        <div class="flex text-yellow-400 text-xs gap-0.5">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">$21.50</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book 4 -->
+            <div class="book-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group">
+                <div class="relative h-64 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=800" alt="Book Cover" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-regular fa-heart"></i></button>
+                        <button class="p-2 bg-white rounded-full hover:bg-library-accent hover:text-white transition"><i class="fa-solid fa-cart-shopping"></i></button>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">Available</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-xs text-library-accent font-semibold mb-1 uppercase tracking-wider">Design</div>
+                    <h3 class="font-serif font-bold text-lg text-library-dark mb-1">Abstract Art</h3>
+                    <p class="text-slate-500 text-sm mb-4">Sarah Jenkins</p>
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+                        <div class="flex text-yellow-400 text-xs gap-0.5">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">$29.99</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Services / Promo Section -->
+<section id="services" class="bg-library-primary py-20 relative overflow-hidden">
+    <!-- Decorative Circle -->
+    <div class="absolute -top-20 -left-20 w-64 h-64 bg-white opacity-5 rounded-full"></div>
+    <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-library-accent opacity-10 rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="font-serif text-3xl md:text-5xl font-bold text-white mb-6">More Than Just Books</h2>
+                <p class="text-slate-300 text-lg mb-8">
+                    Lumina Library provides a quiet sanctuary for study, high-speed internet access, and community rooms for collaborative projects. Join our digital workshop series today.
+                </p>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center text-slate-200">
+                        <i class="fa-solid fa-check-circle text-library-accent mr-3"></i> Private Study Rooms
+                    </li>
+                    <li class="flex items-center text-slate-200">
+                        <i class="fa-solid fa-check-circle text-library-accent mr-3"></i> High-Speed Free WiFi
+                    </li>
+                    <li class="flex items-center text-slate-200">
+                        <i class="fa-solid fa-check-circle text-library-accent mr-3"></i> Kids Learning Zone
+                    </li>
+                </ul>
+                <a href="#" class="inline-block px-8 py-4 bg-library-accent text-white font-bold rounded-lg hover:bg-amber-700 transition shadow-lg">
+                    Become a Member
+                </a>
+            </div>
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=800" alt="Library Interior" class="rounded-lg shadow-2xl border-4 border-white/10">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-library-dark text-slate-300 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <!-- Brand -->
+            <div class="col-span-1 md:col-span-1">
+                <a href="#" class="flex items-center gap-2 mb-4 text-white">
+                    <i class="fa-solid fa-book-open-reader text-2xl text-library-accent"></i>
+                    <span class="font-serif text-xl font-bold">Lumina.</span>
+                </a>
+                <p class="text-sm text-slate-400 mb-6">
+                    Empowering minds through knowledge and community since 1995.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-library-accent hover:text-white transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-library-accent hover:text-white transition"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-library-accent hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="text-white font-bold mb-6">Quick Links</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="hover:text-library-accent transition">About Us</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">Catalog</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">Events</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">News</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div>
+                <h4 class="text-white font-bold mb-6">Support</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="hover:text-library-accent transition">Help Center</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">Book Request</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">Room Booking</a></li>
+                    <li><a href="#" class="hover:text-library-accent transition">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div>
+                <h4 class="text-white font-bold mb-6">Newsletter</h4>
+                <p class="text-sm text-slate-400 mb-4">Subscribe to get the latest book updates.</p>
+                <form class="flex flex-col gap-2">
+                    <input type="email" placeholder="Your email address" class="px-4 py-2 bg-slate-800 border border-slate-700 rounded focus:outline-none focus:border-library-accent text-white">
+                    <button class="px-4 py-2 bg-library-accent text-white font-bold rounded hover:bg-amber-700 transition">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-sm text-slate-500">© 2025 Lumina Public Library. All rights reserved.</p>
+            <div class="flex space-x-6 text-sm text-slate-500 mt-4 md:mt-0">
+                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="#" class="hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript -->
+<script>
+    // Mobile Menu Toggle
+    function toggleMenu() {
+        const menu = document.getElementById('mobile-menu');
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+        } else {
+            menu.classList.add('hidden');
+        }
+    }
+
+    // Navbar Shadow on Scroll
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 20) {
+            navbar.classList.add('shadow-md');
+            navbar.classList.add('bg-white/95');
+            navbar.classList.add('backdrop-blur');
+        } else {
+            navbar.classList.remove('shadow-md');
+            navbar.classList.remove('bg-white/95');
+            navbar.classList.remove('backdrop-blur');
+        }
+    });
+</script>
+</body>
+</html>
