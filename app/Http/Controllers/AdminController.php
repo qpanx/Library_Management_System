@@ -15,7 +15,7 @@ class AdminController extends Controller
 
         if(Auth::id())
    {
-
+       $test = "test";
        $usertype = Auth()->user()->usertype;
 
        if($usertype == 'admin'){
